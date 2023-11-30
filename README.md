@@ -3,7 +3,7 @@ Ansible playbook to remove k3s kubernetes
 
 ## Description
 This Playbook will remove [k3s](https://k3s.io/) using the built-in k3s scripts and then it ensure that the application and its pre-requisites have been removed.
-Please pay attention to what will be removed and customize it for your needs; the goal of this playbook is to provide a quick way to tear down a k3s `lab/testing` environment, providing a clean-slate to re-deploy from. <br>
+Please pay attention to what will be removed and customize it for your needs; the goal of this playbook is to provide a quick way to tear down a k3s `lab/testing` environment, providing a clean-slate to re-deploy onto. <br>
 <br>
 **If you want to use this in Production then please customise the app removal step.**
 
@@ -19,5 +19,5 @@ ansible-playbook -K main.yml
 
 
 # To-do
-- [ x ] Run removal scripts depending on whether server/agent is installed.
+- [x] Run removal scripts depending on whether server/agent is installed.
 - [ ] Make app removal step OS agnostic.
