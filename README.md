@@ -19,5 +19,4 @@ ansible-playbook -K main.yml
 
 
 # To-do
-- [x] Run removal scripts depending on whether server/agent is installed.
 - [ ] Make app removal step OS agnostic.
