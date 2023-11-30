@@ -1,0 +1,71 @@
+- name: Remove k3s
+  hosts: all
+  become: true
+  gather_facts: false
+  tasks:
+
+    - name: Populate service facts
+      ansible.builtin.service_facts:
+
+    - name: Remove all k3s traces
+      when:
+        - ansible_facts.services["k3s-agent.service"] is defined
+        - ansible_facts.services["k3s-server.service"] is defined
+      block:
+        - name: Removal prep
+          ansible.builtin.shell: "{{ item }}"
+          with_items:
+            - 'kubeadm reset -f'
+            - 'k3s kubeadm reset -f'
+            - 'sh /usr/local/bin/k3s-killall.sh'
+          ignore_errors: true
+
+        - name: Remove k3s server
+          ansible.builtin.shell: "{{ item }}"
+          with_items:
+            - 'sh /usr/local/bin/k3s-agent-uninstall.sh'
+          ignore_errors: true
+          when:
+            - ansible_facts.services["k3s-server.service"] is defined
+
+        - name: Remove k3s agent
+          ansible.builtin.shell: "{{ item }}"
+          with_items:
+            - 'sh /usr/local/bin/k3s-agent-uninstall.sh'
+          ignore_errors: true
+          when:
+            - ansible_facts.services["k3s-agent.service"] is defined
+
+        - name: Remove apps
+          ansible.builtin.apt:
+            name: "{{ item }}"
+            state: absent
+            purge: true
+          with_items:
+            - 'kubeadm'
+            - 'kubectl'
+            - 'kubelet'
+            - 'kubernetes-cni'
+            - 'kube*'
+            - 'docker*'
+
+        - name: Delete k3s directories
+          ansible.builtin.file:
+            dest: "{{ item }}"
+            state: absent
+          with_items:
+            - '/etc/rancher/k3s/'
+            - '/opt/cni/bin'
+            - '~/.kube'
+            - '/etc/cni/net.d'
+            - '/etc/kubernetes/'
+            - '/root/.kube'
+            - '/etc/apt/sources.list.d/kubernetes.list'
+            - '/etc/apt/sources.list.d/docker.list'
+            - '/etc/docker'
+            - '/usr/local/bin/k3s'
+
+        - name: Run the equivalent of "apt-get update" as a separate step
+          ansible.builtin.apt:
+            update_cache: true
+            autoremove: true
