@@ -8,9 +8,8 @@
       ansible.builtin.service_facts:
 
     - name: Remove all k3s traces
-      when:
-        - ansible_facts.services["k3s-agent.service"] is defined
-        - ansible_facts.services["k3s-server.service"] is defined
+      when: (ansible_facts.services["k3s-agent.service"] is defined) or
+            (ansible_facts.services["k3s-server.service"] is defined)
       block:
         - name: Removal prep
           ansible.builtin.shell: "{{ item }}"
